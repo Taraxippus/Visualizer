@@ -3,8 +3,7 @@ import android.content.*;
 import android.opengl.*;
 import android.service.wallpaper.*;
 import android.view.*;
-import android.widget.*;
-import android.opengl.GLSurfaceView.*;
+import com.taraxippus.visualizer.gl.*;
 
 public abstract class GLWallpaperService extends WallpaperService
 {
@@ -75,7 +74,7 @@ public abstract class GLWallpaperService extends WallpaperService
 		@Override
 		public void onOffsetsChanged(float xOffset, float yOffset, float xOffsetStep, float yOffsetStep, int xPixelOffset, int yPixelOffset)
 		{
-			(( OpenGLESWallpaperService.GLRenderer)glSurfaceView.renderer).onOffsetChanged(xOffset, yOffset);
+			((GLRenderer)glSurfaceView.renderer).onOffsetChanged(xOffset, yOffset);
 			super.onOffsetsChanged(xOffset, yOffset, xOffsetStep, yOffsetStep, xPixelOffset, yPixelOffset);
 		}
 		
@@ -104,18 +103,18 @@ public abstract class GLWallpaperService extends WallpaperService
 			
 			public void onDestroy()
 			{
-				if (renderer instanceof OpenGLESWallpaperService.GLRenderer)
+				if (renderer instanceof GLRenderer)
 				{
-					(( OpenGLESWallpaperService.GLRenderer)renderer).release();
+					((GLRenderer) renderer).release();
 					super.onDetachedFromWindow();
 				}
 			}
 			
 			public void update()
 			{
-				if (renderer instanceof OpenGLESWallpaperService.GLRenderer)
+				if (renderer instanceof GLRenderer)
 				{
-					(( OpenGLESWallpaperService.GLRenderer)renderer).update();
+					((GLRenderer) renderer).update();
 				}
 			}
 		}

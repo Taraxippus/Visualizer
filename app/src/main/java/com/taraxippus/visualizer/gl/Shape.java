@@ -1,4 +1,4 @@
-package com.taraxippus.visualizer;
+package com.taraxippus.visualizer.gl;
 
 import android.opengl.*;
 import java.nio.*;

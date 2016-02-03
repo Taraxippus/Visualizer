@@ -1,4 +1,4 @@
-package com.taraxippus.visualizer;
+package com.taraxippus.visualizer.gl;
 import android.graphics.*;
 import android.net.*;
 import android.opengl.*;

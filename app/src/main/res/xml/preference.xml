@@ -8,6 +8,11 @@
 			android:summary="Set this as your wallpaper"
             android:key="setWallpaper" 
 		/>
+		<Preference
+            android:title="Show floating visualizer"
+			android:summary="Show a floating visualizer view"
+            android:key="floating" 
+		/>
 		<ListPreference
             android:title="Choose mode"
 			android:summary="Choose between different visualizer modes"
@@ -21,15 +26,15 @@
 			android:defaultValue="false"
             android:key="enableRainbow" 
 		/>
-		<EditTextPreference
+		<Preference
             android:title="Bar color"
-			android:summary="Enter bar color hex value"
+			android:summary="Change bar color"
 			android:defaultValue="#ffffff"
             android:key="barColor" 
 		/>
-		<EditTextPreference
+		<Preference
             android:title="Background color"
-			android:summary="Enter background color hex value"
+			android:summary="Change background color"
 			android:defaultValue="#ff8800"
             android:key="backgroundColor" 
 		/>
@@ -50,6 +55,11 @@
 		<Preference
             android:title="Pick wallpaper"
             android:key="filePicker" 
+			android:dependency="enableBackground"
+		/>
+		<CheckBoxPreference
+            android:title="Use background in floating view"
+            android:key="enableBackgroundFloating" 
 			android:dependency="enableBackground"
 		/>
 	</PreferenceCategory>
