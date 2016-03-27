@@ -226,10 +226,12 @@ public class GLRenderer implements GLSurfaceView.Renderer, Visualizer.OnDataCapt
 	Mode mode;
 	boolean wallpaper;
 
+	public final boolean floating;
+	
 	public GLRenderer(Context context, SurfaceHolder holder)
 	{
 		super();	
-
+		
 		this.context = context;
 		this.holder = holder;
 
@@ -238,9 +240,11 @@ public class GLRenderer implements GLSurfaceView.Renderer, Visualizer.OnDataCapt
 		this.visualizer = new Visualizer(0);
 		this.visualizer.setEnabled(false);
 		this.visualizer.setCaptureSize(COUNT * 2);
-		this.visualizer.setScalingMode(Visualizer.SCALING_MODE_NORMALIZED);
+		//this.visualizer.setScalingMode(Visualizer.SCALING_MODE_NORMALIZED);
 		this.visualizer.setDataCaptureListener(this, 10000, true, true);
 		this.visualizer.setEnabled(true);
+		
+		floating = context instanceof VisualizerService;
 	}
 
 	boolean wallpaperX = false;
@@ -250,12 +254,16 @@ public class GLRenderer implements GLSurfaceView.Renderer, Visualizer.OnDataCapt
 	@Override
 	public void onSurfaceCreated(GL10 p1, javax.microedition.khronos.egl.EGLConfig p2)
 	{
-		String s = PreferenceManager.getDefaultSharedPreferences(context).getString("mode", "bars");
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+		
+		String s = preferences.getString("mode", "bars");
 		this.mode = s.equals("line") ? Mode.LINE : s.equals("bars_circle") ? Mode.BARS_CIRCLE : Mode.BARS;
 
+		boolean mirrored = preferences.getBoolean("mirror", false);
+		
 		if (mode != Mode.LINE)
 		{
-			FloatBuffer bars_vertices = FloatBuffer.allocate(COUNT * 4 * (mode == Mode.BARS ? 8 : 4));
+			FloatBuffer bars_vertices = FloatBuffer.allocate(COUNT * 4 * (mode == Mode.BARS ? 8 : 4) * (mirrored ? 2 : 1));
 
 			if (mode == Mode.BARS_CIRCLE)
 			{
@@ -264,8 +272,8 @@ public class GLRenderer implements GLSurfaceView.Renderer, Visualizer.OnDataCapt
 
 				for (int i = 0; i < COUNT; ++i)
 				{
-					angle = (float)i / COUNT * (float)Math.PI * 2;
-					angle2 = (i * (BAR_WIDTH + BAR_SPACE) + BAR_WIDTH) / (COUNT * (BAR_SPACE + BAR_WIDTH)) * (float)Math.PI * 2;
+					angle = (float)i / COUNT * (float)Math.PI * (mirrored ? 1 : 2);
+					angle2 = (i * (BAR_WIDTH + BAR_SPACE) + BAR_WIDTH) / (COUNT * (BAR_SPACE + BAR_WIDTH)) * (float)Math.PI * (mirrored ? 1 : 2);
 
 					bars_vertices.put((float) Math.cos(angle) * radius);
 					bars_vertices.put(-0.5F);
@@ -286,6 +294,36 @@ public class GLRenderer implements GLSurfaceView.Renderer, Visualizer.OnDataCapt
 					bars_vertices.put(1F);
 					bars_vertices.put((float) Math.sin(angle2) * radius);		
 					bars_vertices.put(i);
+				}
+				
+				if (mirrored)
+				{
+
+					for (int i = 0; i < COUNT; ++i)
+					{
+						angle = (float)Math.PI + (float)i / COUNT * (float)Math.PI;
+						angle2 = (float)Math.PI + (i * (BAR_WIDTH + BAR_SPACE) + BAR_WIDTH) / (COUNT * (BAR_SPACE + BAR_WIDTH)) * (float)Math.PI;
+
+						bars_vertices.put((float) Math.cos(angle) * radius);
+						bars_vertices.put(-0.5F);
+						bars_vertices.put((float) Math.sin(angle) * radius);
+						bars_vertices.put(COUNT - i - 1);
+
+						bars_vertices.put((float) Math.cos(angle2) * radius);
+						bars_vertices.put(-0.5F);
+						bars_vertices.put((float) Math.sin(angle2) * radius);
+						bars_vertices.put(COUNT - i - 1);
+
+						bars_vertices.put((float) Math.cos(angle) * radius);
+						bars_vertices.put(1F);
+						bars_vertices.put((float) Math.sin(angle) * radius);
+						bars_vertices.put(COUNT - i - 1);
+
+						bars_vertices.put((float) Math.cos(angle2) * radius);
+						bars_vertices.put(1F);
+						bars_vertices.put((float) Math.sin(angle2) * radius);		
+						bars_vertices.put(COUNT - i - 1);
+					}
 				}
 			}
 			else
@@ -334,9 +372,9 @@ public class GLRenderer implements GLSurfaceView.Renderer, Visualizer.OnDataCapt
 				}
 			}
 
-			ShortBuffer bars_indices = ShortBuffer.allocate(COUNT * 6 * (mode == Mode.BARS ? 2 : 1));
+			ShortBuffer bars_indices = ShortBuffer.allocate(COUNT * 12 * (mode == Mode.BARS ? 2 : 1) * (mirrored ? 2 : 1));
 
-			for (int i = 0; i < COUNT * (mode == Mode.BARS ? 2 : 1); ++i)
+			for (int i = 0; i < COUNT * (mode == Mode.BARS ? 2 : 1) * (mirrored ? 2 : 1); ++i)
 			{
 				bars_indices.put((short) (i * 4));	
 				bars_indices.put((short) (i * 4 + 1));	
@@ -345,12 +383,21 @@ public class GLRenderer implements GLSurfaceView.Renderer, Visualizer.OnDataCapt
 				bars_indices.put((short) (i * 4 + 1));	
 				bars_indices.put((short) (i * 4 + 3));	
 				bars_indices.put((short) (i * 4 + 2));	
+				
+				
+				bars_indices.put((short) (i * 4));	
+				bars_indices.put((short) (i * 4 + 2));	
+				bars_indices.put((short) (i * 4 + 1));	
+
+				bars_indices.put((short) (i * 4 + 1));	
+				bars_indices.put((short) (i * 4 + 2));	
+				bars_indices.put((short) (i * 4 + 3));	
 			}
 
 			bars.init(GLES20.GL_TRIANGLES, bars_vertices, bars_indices);	
 		}
 
-		wallpaper = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enableBackground", false);
+		wallpaper = preferences.getBoolean("enableBackground", false) && (!floating || preferences.getBoolean("enableBackgroundFloating", false));
 
 		if (wallpaper)
 		{
@@ -432,7 +479,7 @@ public class GLRenderer implements GLSurfaceView.Renderer, Visualizer.OnDataCapt
 		}
 
 
-		boolean rainbow = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("enableRainbow", false);
+		boolean rainbow = preferences.getBoolean("enableRainbow", false);
 		if (mode == Mode.LINE)
 		{
 			if (rainbow)
@@ -467,7 +514,7 @@ public class GLRenderer implements GLSurfaceView.Renderer, Visualizer.OnDataCapt
 			}
 		}
 
-		String hex = PreferenceManager.getDefaultSharedPreferences(context).getString("barColor", "#ffffff");
+		String hex = preferences.getString("barColor", "#ffffff");
 		int color = 0xFFFFFF;
 		try
 		{
@@ -483,7 +530,7 @@ public class GLRenderer implements GLSurfaceView.Renderer, Visualizer.OnDataCapt
 		mvpHandle_bars = GLES20.glGetUniformLocation(program_bars.program, "u_MVP");
 		heightHandle_bars = GLES20.glGetUniformLocation(program_bars.program, "u_Height");
 
-		hex = PreferenceManager.getDefaultSharedPreferences(context).getString("backgroundColor", "#ff8800");
+		hex = preferences.getString("backgroundColor", "#ff8800");
 		color = 0xFF8800;
 		try
 		{
@@ -500,9 +547,9 @@ public class GLRenderer implements GLSurfaceView.Renderer, Visualizer.OnDataCapt
 		GLES20.glLineWidth(5F);
 
 		if (mode == Mode.BARS_CIRCLE)
-			Matrix.setLookAtM(view_bars, 0, 0, 10F, 0F, 0, 0, 0, 0, 0, 1);
+			Matrix.setLookAtM(view_bars, 0, preferences.getFloat("cameraX", 0), preferences.getFloat("cameraZ", 10), preferences.getFloat("cameraY", 0), 0, 0, 0, 0, 0, 1);
 		else
-			Matrix.setLookAtM(view_bars, 0, 0, -0.5F, 10F, 0, 0, 0, 0, 1, 0);
+			Matrix.setLookAtM(view_bars, 0, preferences.getFloat("cameraX", 0), preferences.getFloat("cameraY", 0), preferences.getFloat("cameraZ", 10), 0, 0, 0, 0, 1, 0);
 
 		Matrix.setLookAtM(view_background, 0, 0, 0F, 1F, 0, 0, 0, 0, 1, 0);
 
@@ -567,7 +614,7 @@ public class GLRenderer implements GLSurfaceView.Renderer, Visualizer.OnDataCapt
 				bars_vertices.put((i - COUNT * LINE_COUNT) * 0.01F);
 				bars_vertices.put((waveform[i + offset] / 255F + (waveform[i + offset] > 0 ? -0.5F : 0.5F)) * 40F);
 				bars_vertices.put(0);
-				bars_vertices.put(((float)i / COUNT / LINE_COUNT) + (SystemClock.elapsedRealtime() * 0.002F) % 1);
+				bars_vertices.put(((float)i / COUNT / LINE_COUNT) + (System.currentTimeMillis() * 0.002F) % 1);
 			}
 
 			bars.init(GLES20.GL_LINE_STRIP, bars_vertices, COUNT * 2 * LINE_COUNT);
@@ -585,9 +632,9 @@ public class GLRenderer implements GLSurfaceView.Renderer, Visualizer.OnDataCapt
 			for (int i = 0; i < COUNT; ++i)
 			{
 				if (i == 0)
-					height_bars[0] = height_bars[0] * 0.75F + 0.25F * 2 * nanToZero(Math.log10(fft[0] * fft[0] * 2));
+					height_bars[0] = height_bars[0] * 0.75F + 0.25F * 2 * (float)nanToZero(Math.log10(fft[0] * fft[0] * 2));
 				else
-					height_bars[i] = height_bars[i] * 0.75F + 0.25F * 2 * nanToZero(Math.log10(Math.abs(fft[i * 2] * fft[i * 2] + fft[i * 2 + 1] * fft[i * 2 + 1])));
+					height_bars[i] = height_bars[i] * 0.75F + 0.25F * 2 * (float)nanToZero(Math.log10(Math.abs(fft[i * 2] * fft[i * 2] + fft[i * 2 + 1] * fft[i * 2 + 1])));
 
 			}
 
@@ -598,7 +645,7 @@ public class GLRenderer implements GLSurfaceView.Renderer, Visualizer.OnDataCapt
 			program_background.use();
 
 			Matrix.setIdentityM(model, 0);
-
+			
 			Matrix.multiplyMM(mvp, 0, view_background, 0, model, 0);
 			Matrix.multiplyMM(mvp, 0, projection_background, 0, mvp, 0);
 
@@ -625,7 +672,7 @@ public class GLRenderer implements GLSurfaceView.Renderer, Visualizer.OnDataCapt
 
 	public float nanToZero(double f)
 	{
-		return Double.isInfinite(f) || Double.isNaN(f) ? 0F : (float) f;
+		return Float.isInfinite((float)f) || Float.isNaN((float)f) ? 0 :(float) f;
 	}
 
 	public void release()

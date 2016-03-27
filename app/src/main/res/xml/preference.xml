@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+	
 	<PreferenceCategory 
 		android:title="General">
 
@@ -9,10 +10,16 @@
             android:key="setWallpaper" 
 		/>
 		<Preference
-            android:title="Show floating visualizer"
-			android:summary="Show a floating visualizer view"
+            android:title="Show/Hide floating visualizer"
+			android:summary="Shows a floating visualizer view, which will be drawn over other apps. This is also useful to preview the settings"
             android:key="floating" 
 		/>
+		
+	</PreferenceCategory>
+	
+	<PreferenceCategory 
+		android:title="Visualization">
+
 		<ListPreference
             android:title="Choose mode"
 			android:summary="Choose between different visualizer modes"
@@ -21,48 +28,166 @@
 			android:defaultValue="bars"
             android:key="mode" 
 		/>
+
+		<CheckBoxPreference
+            android:title="Mirror visualization"
+			android:summary="Toggle if the visualization should be mirrored"
+            android:key="mirror" 
+			android:defaultValue="false"
+		/>
+
+		<CheckBoxPreference
+            android:title="Smooth edges"
+			android:summary="Toggle if the visualization should be smoothed on the sides"
+            android:key="smoothEdges" 
+			android:defaultValue="false"
+		/>
+	
+		<CheckBoxPreference
+            android:title="Volume indepent"
+			android:summary="Toggle if the bar height should change with the volume"
+            android:key="enableEqualizer" 
+			android:defaultValue="false"
+		/>
+		<Preference
+            android:title="Min bar height"
+			android:summary="Minium bar height"
+            android:key="min" 
+		/>
+		<Preference
+            android:title="Bar scale"
+			android:summary="Modify the height of the bars"
+            android:key="scale" 
+		/>
+		<Preference
+            android:title="Animation smoothness"
+			android:summary="Change the smoothness of the animation"
+            android:key="smoothness" 
+		/>
+
+	</PreferenceCategory>
+	
+	<PreferenceCategory 
+		android:title="Colors">
+		
 		<CheckBoxPreference
             android:title="Enable rainbow mode"
 			android:defaultValue="false"
             android:key="enableRainbow" 
 		/>
+	
 		<Preference
             android:title="Bar color"
 			android:summary="Change bar color"
 			android:defaultValue="#ffffff"
             android:key="barColor" 
 		/>
+	
 		<Preference
             android:title="Background color"
 			android:summary="Change background color"
 			android:defaultValue="#ff8800"
             android:key="backgroundColor" 
 		/>
+	
+	</PreferenceCategory>
+	
+	<PreferenceCategory 
+		android:title="Reflection">
+		
+		<Preference
+            android:title="Offset"
+			android:summary="Change the offset between bars and reflection"
+            android:key="reflectionOffset" 
+		/>
+		<Preference
+            android:title="Alpha"
+			android:summary="Change maximum alpha of the reflection"
+            android:key="reflectionAlpha" 
+		/>
+		<Preference
+            android:title="Alpha decay"
+			android:summary="Change how fast the reflection fades"
+            android:key="reflectionDecay" 
+		/>
+		<Preference
+            android:title="Alpha decay start"
+			android:summary="Change when the reflection starts to fade"
+            android:key="reflectionDecayStart" 
+		/>
+		
+	</PreferenceCategory>
+	
+	<PreferenceCategory 
+		android:title="3D Settings">
+
 		<CheckBoxPreference
             android:title="Enable antialiasing"
 			android:summary="Use 4x MSAA"
 			android:defaultValue="true"
             android:key="enableMSAA" 
 		/>
+		
+		<Preference
+            android:title="Change position"
+			android:summary="Change position of the bars"
+            android:key="position" 
+		/>
+		<Preference
+            android:title="Change rotation"
+			android:summary="Change rotation of the bars"
+            android:key="rotation" 
+		/>
+		<Preference
+            android:title="Change camera offset"
+			android:summary="Change the camera offset"
+            android:key="camera" 
+		/>
+		<CheckBoxPreference
+            android:title="Custom GLSL shaders"
+			android:summary="Specify custom glsl es shaders. Only enable if you know what your doing."
+            android:key="customShader" 
+		/>
+		<Preference
+            android:title="Edit vertex shader"
+            android:key="editVertexShader" 
+			android:dependency="customShader"
+		/>
+		<Preference
+            android:title="Edit fragment shader"
+            android:key="editVertexShader" 
+			android:dependency="customShader"
+		/>
+		<Preference
+            android:title="Edit background fragment shader"
+            android:key="editBackgroundShader" 
+			android:dependency="customShader"
+		/>
+	
 	</PreferenceCategory>
+	
 	<PreferenceCategory 
 		android:title="Background">
 
 		<CheckBoxPreference
             android:title="Enable background wallpaper"
+			android:summary="Use a background image instead of a color as the background"
             android:key="enableBackground" 
 		/>
 		<Preference
             android:title="Pick wallpaper"
+			android:summary="Choose an image from storage"
             android:key="filePicker" 
 			android:dependency="enableBackground"
 		/>
 		<CheckBoxPreference
-            android:title="Use background in floating view"
+            android:title="Enable floating wallpaper"
+			android:summary="Also use the wallpaper for the floating view"
             android:key="enableBackgroundFloating" 
 			android:dependency="enableBackground"
 		/>
 	</PreferenceCategory>
+	
 	<PreferenceCategory 
 		android:title="Debug">
 		

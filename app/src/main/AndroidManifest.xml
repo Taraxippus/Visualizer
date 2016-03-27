@@ -35,7 +35,7 @@
 		</activity>
 		
 		<service
-			android:name=".OpenGLESWallpaperService"
+			android:name=".gl.OpenGLESWallpaperService"
 			android:label="Visualizer"
 			android:permission="android.permission.BIND_WALLPAPER" >
 			<intent-filter>

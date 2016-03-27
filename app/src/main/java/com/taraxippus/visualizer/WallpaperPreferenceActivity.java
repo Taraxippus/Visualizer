@@ -92,6 +92,11 @@ public class WallpaperPreferenceActivity extends PreferenceActivity
 		
 		chooseColor("barColor", "#ffffff");
 		chooseColor("backgroundColor", "#ff8800");
+		
+		sliders("position", "Change position of the bars", "Position", 0, 0, 0, 0, 10, 2);
+		sliders("rotation", "Change rotation of the bars", "Rotation", 0, 0, 0, 0, (float) Math.PI, 100);
+		sliders("camera", "Change the camera offset", "Camera offset", 0, 0, 10, 0, 15, 2);
+		
 	}
 	
 	private boolean isServiceRunning(Class<?> serviceClass) 
@@ -286,6 +291,95 @@ public class WallpaperPreferenceActivity extends PreferenceActivity
 		green = (green << 8) & 0x0000FF00;
 		blue = blue & 0x000000FF;
 		return 0xFF000000 | red | blue | green;
+	}
+	
+
+	public void sliders(final String key, final String summary, final String dialogTitle, final float defX, final float defY, final float defZ, final float zero, final float range, final float scale)
+	{
+		final Preference p = findPreference(key);
+		final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+		
+		p.setSummary(summary + "\nCurrent: "
+					 + "(X: " + (int) (preferences.getFloat(key + "X", defX) * 100) / 100F
+					 + "; Y: " + (int) (preferences.getFloat(key + "Y", defY) * 100) / 100F
+					 + "; Z: " + (int) (preferences.getFloat(key + "Z", defZ) * 100) / 100F
+					 + ")"																			 
+					 );
+					 
+		p.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+			{
+				@Override
+				public boolean onPreferenceClick(Preference p1)
+				{
+					final AlertDialog alertDialog = new AlertDialog.Builder(WallpaperPreferenceActivity.this).create();
+					alertDialog.setTitle(dialogTitle);
+
+					final View v = getLayoutInflater().inflate(R.layout.sliders, null);
+					alertDialog.setView(v);
+
+					final SeekBar x = (SeekBar) v.findViewById(R.id.x);
+					x.setMax((int) ((range - zero + range) * scale));
+					x.setProgress((int) (scale * (range + preferences.getFloat(key + "X", defX))));
+					
+					final SeekBar y = (SeekBar) v.findViewById(R.id.y);
+					y.setMax((int) ((range - zero + range) * scale));
+					y.setProgress((int) (scale * (range + preferences.getFloat(key + "Y", defY))));
+					
+					final SeekBar z = (SeekBar) v.findViewById(R.id.z);
+					z.setMax((int) ((range - zero + range) * scale));
+					z.setProgress((int) (scale * (range + preferences.getFloat(key + "Z", defZ))));
+					
+					
+					alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", new AlertDialog.OnClickListener()
+						{
+							@Override
+							public void onClick(DialogInterface p1, int p2)
+							{
+								preferences.edit().putFloat(key + "X", x.getProgress() / scale - range)
+									.putFloat(key + "Y", y.getProgress() / scale - range)
+									.putFloat(key + "Z", z.getProgress() / scale - range).commit();
+								
+								p.setSummary(summary + "\nCurrent: "
+											 + "(X: " + (int) (preferences.getFloat(key + "X", defX) * 100) / 100F
+											 + "; Y: " + (int) (preferences.getFloat(key + "Y", defY) * 100) / 100F
+											 + "; Z: " + (int) (preferences.getFloat(key + "Z", defZ) * 100) / 100F
+											 + ")"																			 
+											 );
+									
+								alertDialog.dismiss();
+							}
+						});
+					alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel", new AlertDialog.OnClickListener()
+						{
+							@Override
+							public void onClick(DialogInterface p1, int p2)
+							{
+								alertDialog.cancel();
+							}
+						});
+					alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Reset", new AlertDialog.OnClickListener()
+						{
+							@Override
+							public void onClick(DialogInterface p1, int p2)
+							{
+								preferences.edit().putFloat(key + "X", defX).putFloat(key + "Y", defY).putFloat(key + "Z", defZ).commit();
+								
+								p.setSummary(summary + "\nCurrent: "
+											 + "(X: " + (int) (preferences.getFloat(key + "X", defX) * 100) / 100F
+											 + "; Y: " + (int) (preferences.getFloat(key + "Y", defY) * 100) / 100F
+											 + "; Z: " + (int) (preferences.getFloat(key + "Z", defZ) * 100) / 100F
+											 + ")"																			 
+											 );
+								
+								alertDialog.dismiss();
+							}
+						});
+
+					alertDialog.show();
+
+					return true;
+				}
+			});
 	}
 
 	public void setSummary(final String summary, final String key)

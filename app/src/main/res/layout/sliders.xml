@@ -6,24 +6,11 @@
 	android:paddingRight="20dp"
 	android:paddingTop="20dp">
 
-	<View
-		android:id="@+id/color"
-		android:background="@drawable/circle"
-		android:layout_width="100dp"
-		android:layout_height="100dp"
-		android:layout_gravity="center"
-		android:padding="16dp"
-		android:elevation="8dp"
-		android:clickable="true"
-		android:foreground="?android:attr/selectableItemBackground"
-	/>
-
 	<ScrollView
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		android:orientation="vertical"
-		android:paddingTop="16dp">
-		
+		android:orientation="vertical">
+
 		<LinearLayout
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
@@ -37,63 +24,17 @@
 				<TextView
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:text="R:"/>
+					android:text="X:"/>
 
 				<SeekBar	
-					android:id="@+id/red"
+					android:id="@+id/x"
 					android:paddingBottom="16dp"
 					android:layout_width="fill_parent"
 					android:layout_height="wrap_content"
-					android:foreground="#ff0000"
-					android:max="255"/>
-			</LinearLayout>
-
-			<LinearLayout
-				android:layout_width="fill_parent"
-				android:layout_height="wrap_content"
-				android:orientation="horizontal">
-
-				<TextView
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:text="G:"/>
-
-				<SeekBar
-					android:id="@+id/green"
-					android:paddingBottom="16dp"
-					android:layout_width="fill_parent"
-					android:layout_height="wrap_content"
-					android:foreground="#00ff00"
-					android:max="255"/>
-			</LinearLayout>
-
-			<LinearLayout
-				android:layout_width="fill_parent"
-				android:layout_height="wrap_content"
-				android:orientation="horizontal">
-
-				<TextView
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:text="B:"/>
-
-				<SeekBar
-					android:id="@+id/blue"
-					android:paddingBottom="16dp"
-					android:layout_width="fill_parent"
-					android:layout_height="wrap_content"
-					android:foreground="#0000ff"
-					android:max="255"/>
-			</LinearLayout>
-
-			<View
-				android:layout_width="match_parent"
-				android:layout_height="2dp"
-				android:background="?android:attr/listDivider"
 			/>
+			</LinearLayout>
 
 			<LinearLayout
-				android:paddingTop="4dp"
 				android:layout_width="fill_parent"
 				android:layout_height="wrap_content"
 				android:orientation="horizontal">
@@ -101,24 +42,36 @@
 				<TextView
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:text="#"/>
+					android:text="Y:"/>
 
-				<EditText
-					android:id="@+id/hex"
-					android:text="000000"
-					android:hint="Hexcode"
+				<SeekBar
+					android:id="@+id/y"
+					android:paddingBottom="16dp"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					/>
+			</LinearLayout>
+
+			<LinearLayout
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:orientation="horizontal">
+
+				<TextView
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:singleLine="true"
-					android:maxLines="1"
-					android:maxLength="6"
-					android:digits="01234567890ABCDEF"
-					android:inputType="text|textCapCharacters|textNoSuggestions"
-					android:imeOptions="actionGo"
-				/>
+					android:text="Z:"/>
+
+				<SeekBar
+					android:id="@+id/z"
+					android:paddingBottom="16dp"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+			/>
 			</LinearLayout>
+			
 		</LinearLayout>
-	
+
 	</ScrollView>
 
 </LinearLayout>
